@@ -1,0 +1,694 @@
+<html>
+<head>
+
+<style>
+
+@font-face {
+    font-family: 'bodonixtregular';
+    src: url('BodoniXT-webfont.eot');
+    src: url('BodoniXT-webfont.eot?#iefix') format('embedded-opentype'),
+         url('BodoniXT-webfont.woff2') format('woff2'),
+         url('BodoniXT-webfont.woff') format('woff'),
+         url('BodoniXT-webfont.ttf') format('truetype'),
+         url('BodoniXT-webfont.svg#bodonixtregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+body { 
+    font: normal 20px/28px bodonixtregular,arial;  
+    background: black; 
+    color: rgb(230, 0, 255);
+}
+
+
+#header {
+    text-align: center;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 150px;
+}
+
+.start-trans {
+    transition: all 1s;
+}
+
+#header img {
+    width: 50%;
+    margin: 0 auto;
+}
+
+.column {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    min-height: 100%;
+}
+
+.column .inner {
+    text-align: justify;
+    word-break: break-all;
+    box-sizing: border-box;
+    padding: 0 5px;
+    
+}
+.column-container {
+    display: inline-block;
+    width: 16.666%;
+    box-sizing: border-box;
+    position: relative;
+    height: 100%;
+}
+
+.column .dummy {
+    height: 0px;
+}
+
+.column .post {
+    box-sizing: border-box;
+}
+
+.column h2 {
+    padding-bottom: 0.4em;
+    margin: 0;
+}
+
+.column p {
+    padding-top: 0.5em;
+    margin: 0;
+}
+
+.columns {
+   position: absolute;
+   top: 150px;
+   left: 0;
+   right: 0;
+   bottom: 0;
+}
+
+.columns:after {
+    display: table;
+    content: ' ';
+    clear: both;
+}
+</style>
+
+<script type="text/javascript" src="jquery-2.1.3.js"></script>
+<script type="text/javascript" src="lodash.js"></script>
+</head>
+<body>
+<div id="header">
+    <img src="logo-nighttimes.png" />
+</div>
+<div class="columns"></div>
+<script>
+var numColumns = 6;
+var addrStart = 0;
+
+/**
+ * Main controller, owns columns + persister. Pipes all keydown/key up events
+ * to their correct column instance.
+ * @param {number} numCols
+ * @param {number} addrStart
+ * @constructor
+ */
+var Controller = function(numCols, addrStart) {
+    var self = this;
+    this.currentAddr = -1;
+    this.numColumns = numCols;
+    this.addrStart = addrStart;
+    this.persister = new Persister();
+    this.columns = null;
+
+    // Initialize the persister and then load columns and start listening for
+    // key events.
+    this.persister.init().then(function() {
+        self.columns = _.map(_.range(self.numColumns), function(id) {
+            var column = new Column(self.addrStart + id, self.persister);
+            $('.columns').append(column.container);
+            return column;
+        });
+
+        $(document).bind('keydown', function(evt) { self.keyDown(evt); });
+        $(document).bind('keyup', function(evt) { self.keyUp(evt); });
+        $(document).bind('keypress', function(evt) { self.keyPress(evt); });
+    });      
+};
+
+/**
+ * Key down handler. If the key is an f1-f12 key it is a set address key which
+ * selects the appropriate column, we also check for keys that don't generate
+ * keyPress events, like delete/backspace.
+ * @param {Event} evt
+ */
+Controller.prototype.keyDown = function(evt) {
+    //evt.preventDefault();
+    var keyCode = evt.keyCode;
+    //console.log('kcd:'  +keyCode);
+    if (keyCode >= 112 && keyCode < 112 + this.columns.length) {
+        this.startAddr(keyCode - 112);
+    } else if (keyCode == 8 || keyCode == 127) { // Delete
+        if (this.currentAddr > -1) {
+            this.columns[this.currentAddr].keyBack();
+        }
+    }
+};
+
+/**
+ * Key up handler. If the key is an f1-f12 key it is an unset address key
+ * which deselects that column channel.
+ * @param {Event} evt
+ */
+Controller.prototype.keyUp = function(evt) {
+    var keyCode = evt.keyCode;
+
+    if (keyCode >= 112 && keyCode < 112 + this.columns.length) {
+        this.endAddr(keyCode - 112);
+    }
+};
+
+/**
+ * Key press handler. Forwards all events to the current column channel, if 
+ * there is one.
+ * @param {Event} evt
+ */
+Controller.prototype.keyPress = function(evt) {
+    if (this.currentAddr > -1) {
+        this.columns[this.currentAddr].keyPress(evt.charCode);
+    }
+};
+
+
+/**
+ * Convenience function for setting the current colum channel.
+ * @param {number} addr
+ */
+Controller.prototype.startAddr = function(addr) {
+    if (this.currentAddr != addr && addr >= this.addrStart && addr < this.addrStart + this.numColumns) {
+        this.currentAddr = addr;
+    }
+};
+
+/**
+ * Convenience function for unsetting the current column channel.
+ * @param {number} addr
+ */
+Controller.prototype.endAddr = function(addr) {
+    if (addr == this.currentAddr) {
+        this.currentAddr = -1;
+    }
+};
+
+/**
+ * A post model.
+ * @constructor
+ */
+var Post = function() {
+    this.time = 0;
+    this.header = '';
+    this.body = '';
+};
+
+/**
+ * @const {number}
+ */
+Post.MAX_IDLE_TIME_MS = 15000;
+
+/**
+ * @const {number}
+ */
+Post.MAX_HEADER_TIME_MS = 7000;
+
+/**
+ * @const {number}
+ */
+Post.MAX_HEADER_CHARS = 128;
+
+/**
+ * @const {number}
+ */
+Post.MAX_BODY_CHARS = 2000;
+
+/**
+ * Whether the post is untouched (not typed into yet.)
+ * @return {boolean}
+ */
+Post.prototype.isEmpty = function() {
+    return !this.header && !this.body;
+};
+
+/**
+ * Whether the post is too full where it should be ended by force.
+ * @return {boolean}
+ */
+Post.prototype.isFull = function() {
+    return this.body.length >= Post.MAX_BODY_CHARS;
+};
+
+Post.prototype.isHeaderFull = function() {
+    return this.header.length >= Post.MAX_HEADER_CHARS;
+};
+
+Post.prototype.getNumHeaderWords = function() {
+    return this.header.split(/\s+/).length ;
+};
+
+/**
+ * Whether the header is empty.
+ */
+Post.prototype.isHeaderEmpty = function() {
+    return !this.header;
+};
+
+Post.prototype.isBodyEmpty = function() {
+    return !this.body;
+};
+
+Post.prototype.deleteHeaderChar = function() {
+    if (this.header.length) {
+        this.header = this.header.substr(this.header.length - 1);
+    }
+};
+
+Post.prototype.deleteBodyChar = function() {
+    if (this.body.length) {
+        this.body = this.body.substr(this.body.length - 1);
+    }
+};
+
+Post.prototype.set = function(post) {
+    this.reset();
+    this.header = post && post.header ? post.header : '';
+    this.body = post && post.body ? post.body : '';
+
+};
+
+/**
+ * Resets the post to its untouched state.
+ */
+Post.prototype.reset = function() {
+    this.time = Date.now();
+    this.header = '';
+    this.body = '';
+};
+
+/**
+ * Html content for a single post. This is a reusable component that represents
+ * a single post. It gets appended to a column and can be filled with content.
+ * @constructor
+ */
+var PostView = function() {
+    this.container = $('<div class="post">');
+    this.header = $('<h2>');
+    this.body = $('<p>');
+
+    this.container.append(this.header);
+    this.container.append(this.body);
+};
+
+/**
+ * @type {Array.<PostView>}
+ */
+PostView.pool = [];
+
+/**
+ * Factory function for creating a PostView from the pool.
+ */
+PostView.create = function() {
+    if (PostView.pool.length) {
+        var view = PostView.pool.pop();
+        view.reset();
+        return view;
+    }
+
+    return new PostView();
+};
+
+/**
+ * Factory function for returning a PostView to the pool when done using it.
+ */
+PostView.dispose = function(view) {
+    view.container.remove();
+    PostView.pool.push(view);
+};
+
+/**
+ * Convenience function for taking the keyboard input and formatting it as
+ * html.
+ * @param {string} text
+ */
+PostView.prototype.formatHtml = function(text) {
+    return text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/ /g, '&nbsp;').replace(/\r/g, '<br>');
+};
+
+/**
+ * Resets the PostView so it can be reused.
+ */
+PostView.prototype.reset = function() {
+    this.container.css({'position': '', 'width': '', 'height': '', 'transform':''});
+    this.container.removeClass('start-trans');
+    this.setHeader('');
+    this.setBody('');
+};
+
+/**
+ * Sets the header keyboard text.
+ */
+PostView.prototype.setHeader = function(text) {
+    this.header.html(this.formatHtml(text));
+};
+
+/**
+ * Sets the body keyboard text.
+ * @param {string} text
+ */
+PostView.prototype.setBody = function(text) {
+    this.body.html(this.formatHtml(text));
+};
+
+/**
+ * Updates the postview with the model data.
+ * @param {Post} post
+ */
+PostView.prototype.update = function(post) {
+    this.setHeader(post.header);
+    this.setBody(post.body);
+};
+
+
+
+/**
+ * A column of text that is linked to a single keyboard via an id/address.
+ * @param {number} id
+ * @param {Persister} persister
+ */
+var Column = function(id, persister) {
+    var self = this;
+    this.id = id;
+
+    this.container = $('<div class="column-container">');
+    this.column = $('<div class="column">');
+    this.el = $('<div class="inner">');
+    this.dummy = $('<div class="dummy">');
+
+    
+    this.persister = persister;
+    this.post = new Post();
+    this.pruneInterval = -1;
+
+    this.isHeader = false;
+    this.numHeaderWords = 0;
+
+    this.postViews = [];
+    
+this.el.append(this.dummy);
+    this.column.append(this.el);
+    this.container.append(this.column);
+    
+
+    
+
+    // Load posts from database.
+    this.persister.load(id).then(function(posts) {
+        // Posts are loaded in descending order, but we want the newest post
+        // last, so we reverse.
+        posts.reverse();
+
+        _.each(posts, function(postData) {
+
+            var postView = PostView.create();
+            var post = new Post();
+            post.set(postData);
+            postView.update(post);
+            self.push(postView);
+
+
+        });
+
+        // Auto prune to make sure we don't go over the column size.
+        var initInterval = setInterval(function() {
+            if ($('.columns').height() > 0) {
+                console.log('height:' + $('.columns').height());
+                self.prune(true);
+                self.init();
+                clearInterval(initInterval);
+            }
+            
+        }, 100);
+        
+    });
+};
+
+Column.prototype.init = function() {
+    // Create an empty post to type into
+    this.isHeader = true;
+    this.numHeaderWords = (2 + Math.random() * 5) | 0;
+    this.push(PostView.create());
+    // If a post is untouched for 15 seconds it is persisted and a new post
+    // is created.
+    var self = this;
+    this.postCheckInterval = setInterval(function() {
+        if (!self.post.isEmpty()) {
+            var time = Date.now();
+            if (time - self.post.time > Post.MAX_IDLE_TIME_MS || (self.post.isFull())) {
+                self.persist();
+            }
+        }
+    }, 1000);
+
+
+    // Start auto-pruning every 2 seconds while someone is typing. If they stop
+    // for 5 seconds we stop the interval.
+    if (this.pruneInterval == -1) {
+        console.log('starting prune interval');
+        this.pruneInterval = setInterval(function() {
+            self.prune();
+        }, 2000);
+    }
+};
+
+Column.prototype.getCurrentPostView = function() {
+    return this.postViews[this.postViews.length - 1];
+};
+
+/**
+ * Convenience function for pushing the a new post onto the column dom. Keeps
+ * track of all the posts using an array so we can prune them later.
+ * @param {PostView} postView
+ */
+Column.prototype.push = function(postView) {
+    this.postViews.push(postView);
+    this.el.append(postView.container);
+};
+
+/**
+ * Keypress handler received from controller. Reads the character code and 
+ * appends the proper string to the current postview.
+ */
+Column.prototype.keyPress = function(charCode) {
+    var time = Date.now();
+/*
+    if (!this.post) {
+        this.isHeader = true;
+        this.numHeaderWords = 2 + (Math.random() * 2 | 0);
+
+        this.post = {
+            time: time,
+            header: '',
+            body: ''
+        };
+
+        this.push(this.postEl = PostView.create());
+    } else {
+        this.post.time = time;
+    }
+    */
+
+    var prevPostTime = this.post.time;
+    this.post.time = time;
+
+    // Header is over if its been 5 seconds, they hit enter, the header is
+    // more than 128 characters, or the header is more than the number of
+    // words.
+    if (this.isHeader && !this.post.isHeaderEmpty()) {
+        if (
+                charCode == 13 || 
+                this.post.isHeaderFull() || 
+                this.post.getNumHeaderWords() >= this.numHeaderWords) {
+            this.isHeader = false;
+        }
+    } 
+
+    if (this.isHeader) {
+        // Ignore any return calls within the header
+        if (charCode != 13) {
+            this.post.header += String.fromCharCode(charCode);
+            this.getCurrentPostView().setHeader(this.post.header);
+        }
+    } else {
+        var isPostBodyEmpty = this.post.isBodyEmpty();
+        var shouldAppend = true;
+        var shouldPersist = false;
+
+        if (isPostBodyEmpty) {
+            if (charCode == 13) {
+                shouldAppend = false;
+            }
+        } else {
+            if (charCode == 13 && this.post.body.length > 2 && 
+                    this.post.body[this.post.body.length - 1] == '\r' &&
+                    this.post.body[this.post.body.length - 2] == '\r') {
+                shouldPersist = true;
+            }
+        }
+
+        if (shouldPersist) {
+            this.persist();
+        } else if (shouldAppend) {
+            this.post.body += String.fromCharCode(charCode);
+            this.getCurrentPostView().setBody(this.post.body);
+        }
+    }
+
+    var self = this;
+
+    
+};
+
+/**
+ * Checks if the posts are nearing the bottom of the screen, if so, it removes
+ * the oldest post and animates up.
+ */
+Column.prototype.prune = function(opt_immediate) {
+    this.pruneTimeout = -1;
+    var self = this;
+    console.log(this.el.height());
+    if (this.postViews.length > 1 && this.el.height() >= $('.columns').height() * 0.9) {
+        // TODO: Animate it away
+        var postView = this.postViews.shift();
+
+        if (opt_immediate) {
+            PostView.dispose(postView);
+            this.prune(true);
+        } else {
+            var height = postView.container.height();
+            var width = postView.container.width();
+            this.dummy.css({'padding-top': height + 'px'});
+            this.dummy.animate({'padding-top': '0px'});
+            
+            postView.container.css({'position': 'absolute', 'width': width + 'px', 'height': height + 'px'});
+            postView.container.addClass('start-trans');
+            setTimeout(function() {
+                postView.container.css({'transform': 'translateY(-500px) rotate(600deg)'})
+                setTimeout(function() {
+                    PostView.dispose(postView);
+                    self.prune();
+                }, 1000);
+            }, 30);
+        }
+    }
+};
+
+Column.prototype.persist = function() {
+    this.persister.persist(this.post, this.id);
+    this.post.reset();
+    this.isHeader = true;
+    this.numHeaderWords = (2 + Math.random() * 5) | 0;
+    this.push(PostView.create());
+};
+
+Column.prototype.keyBack = function() {
+    // If they deleted past the body, then jump back to the header
+    if (!this.isHeader && this.post.isBodyEmpty()) {
+        this.isHeader = true;
+    }
+
+    if (this.isHeader) {
+        this.post.deleteHeaderChar();
+    } else {
+        this.post.deleteBodyChar();
+    }
+};
+
+
+
+/**
+ * Service used to store posts in a database via an ajax endpoint.
+ */
+var Persister = function() {
+};
+
+Persister.prototype.init = function() {
+    var deferred = $.Deferred();
+    deferred.resolve();
+    return deferred.promise();
+};
+
+Persister.prototype.backup = function() {
+    // TODO: backup database to server?
+};
+
+/**
+ * Loads posts from server for a specific column.
+ * @param {number} id
+ */
+Persister.prototype.load = function(id) {
+    var deferred = $.Deferred();
+    var posts = [];
+
+    $.get('/posts/' + id, function(posts) {
+        deferred.resolve(posts);
+    });
+
+    return deferred.promise();
+};
+
+/**
+ * Persists a post to a given column id.
+ * @param {Post} post
+ * @param {number} id
+ */
+Persister.prototype.persist = function(post, id) {
+    // Write teh post to the database
+    var self = this;
+
+    $.post('/posts/' + id, {header: post.header, body: post.body, time: post.time},
+        function() {
+            console.log('posted');
+        }, "json").fail(function() {
+            console.log('post failed');
+        });
+};
+
+Persister.prototype.backupOnPastebin = function(post, id) {
+      var data = this.serialize(post);
+    $.post('http://pastebin.com/api/api_post.php',
+        {api_dev_key: '4a8508ad80e4c593042c97957f5a301c',
+        api_paste_code: data,
+        api_paste_name: 'consider-the-belvedere-' + id,
+        api_paste_private: '0',
+        api_paste_expire_date: 'N',
+        api_paste_format: 'vim',
+        api_paste_user_key: ''},
+        function() {
+            console.log('success');
+        },
+        'jsonp').fail(function() {
+            console.log('failed');
+        });
+};
+
+var c = new Controller(6, 0);
+
+</script>
+</body>
+</html>
