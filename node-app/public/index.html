@@ -159,8 +159,10 @@ Controller.prototype.keyDown = function(evt) {
         if (this.currentAddr > -1) {
             this.columns[this.currentAddr].keyBack();
         }
-        evt.preventDefault();
+        
     }
+
+    evt.preventDefault();
 };
 
 /**
@@ -174,6 +176,8 @@ Controller.prototype.keyUp = function(evt) {
     if (keyCode >= 112 && keyCode < 112 + this.columns.length) {
         this.endAddr(keyCode - 112);
     }
+
+    evt.preventDefault();
 };
 
 /**
@@ -185,6 +189,8 @@ Controller.prototype.keyPress = function(evt) {
     if (this.currentAddr > -1) {
         this.columns[this.currentAddr].keyPress(evt.charCode);
     }
+
+    evt.preventDefault();
 };
 
 
@@ -614,8 +620,11 @@ Column.prototype.keyBack = function() {
 
     if (this.isHeader) {
         this.post.deleteHeaderChar();
+        this.getCurrentPostView().setHeader(this.post.header);
+
     } else {
         this.post.deleteBodyChar();
+        this.getCurrentPostView().setBody(this.post.body);
     }
 };
 
