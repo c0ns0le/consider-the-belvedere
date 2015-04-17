@@ -9,11 +9,8 @@ cat <<EOM >~/Library/LaunchAgents/considerthebelvedere.plist
 <dict>
   <key>Label</key>
   <string>com.considerthebelvedere</string>
-  <key>ProgramArguments</key>
-  <array>
-    <string>bash</string>
-    <string>$STARTUP</string>
-  </array>
+  <key>Program</key>
+  <string>$STARTUP</string>
   <key>RunAtLoad</key>
   <true/>
 </dict>
