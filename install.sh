@@ -7,7 +7,7 @@ cat <<EOM >startup.sh
 #!/bin/sh
 
 cd $APP
-node app.js
+/usr/local/bin/node app.js
 EOM
 
 cat <<EOM >~/Library/LaunchAgents/considerthebelvedere.plist
@@ -29,4 +29,3 @@ cat <<EOM >~/Library/LaunchAgents/considerthebelvedere.plist
 EOM
 
 chmod 755 $STARTUP
-chmod 755 ~/Library/LaunchAgents/considerthebelvedere.plist
