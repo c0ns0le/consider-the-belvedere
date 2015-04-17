@@ -24,3 +24,5 @@ cat <<EOM >~/Library/LaunchAgents/considerthebelvedere.plist
 </dict>
 </plist>
 EOM
+
+chmod 755 $STARTUP
