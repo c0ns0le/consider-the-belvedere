@@ -159,10 +159,11 @@ Controller.prototype.keyDown = function(evt) {
         if (this.currentAddr > -1) {
             this.columns[this.currentAddr].keyBack();
         }
+        evt.preventDefault();
         
     }
 
-    evt.preventDefault();
+    //evt.preventDefault();
 };
 
 /**
@@ -177,7 +178,7 @@ Controller.prototype.keyUp = function(evt) {
         this.endAddr(keyCode - 112);
     }
 
-    evt.preventDefault();
+    //evt.preventDefault();
 };
 
 /**
@@ -190,7 +191,7 @@ Controller.prototype.keyPress = function(evt) {
         this.columns[this.currentAddr].keyPress(evt.charCode);
     }
 
-    evt.preventDefault();
+    //evt.preventDefault();
 };
 
 
