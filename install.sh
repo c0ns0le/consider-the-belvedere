@@ -1,6 +1,14 @@
 #!/bin/sh
 
 STARTUP=$(pwd)/startup.sh
+APP=$(pwd)/node-app
+
+cat <<EOM >startup.sh
+#!/bin/sh
+
+cd $APP
+node app.js
+EOM
 
 cat <<EOM >~/Library/LaunchAgents/considerthebelvedere.plist
 <?xml version="1.0" encoding="UTF-8"?>
@@ -9,7 +17,7 @@ cat <<EOM >~/Library/LaunchAgents/considerthebelvedere.plist
 <dict>
   <key>Label</key>
   <string>com.considerthebelvedere</string>
-  <key>Program</key>
+  <key>ProgramArguments</key>
   <string>$STARTUP</string>
   <key>RunAtLoad</key>
   <true/>

@@ -1,3 +1,4 @@
 #!/bin/sh
 
-node node-app/app.js
+cd /Users/danielriley/documents/arduino/consider-the-belvedere/node-app
+node app.js
