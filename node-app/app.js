@@ -1,6 +1,8 @@
 var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
+var sys = require('sys')
+var childProcess = require('child_process');
 
 var app = express();
 var supercolliderjs = require('supercolliderjs');
@@ -151,6 +153,21 @@ app.set('port', process.env.PORT || 8888);
 
 var server = app.listen(app.get('port'), function() {
   console.log('Express server listening on port ' + server.address().port);
+  console.log('launching chrome...');
+
+  var exists = fs.existsSync('/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome');
+
+  if (exists) {
+    childProcess.exec('/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --kiosk http://localhost:8888/', function(err) {
+      console.log('err:' + err);
+    });
+  } else {
+    console.log('cant find google chrome.');
+  }
 });
+
+
+
+
 
 module.exports = app;

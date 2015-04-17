@@ -1,3 +1,5 @@
+#include <PS2Keyboard.h>
+
  /*  PS2Keyboard library example
   
   PS2Keyboard now requries both pins specified for begin()
@@ -29,7 +31,7 @@
 
 
 // 1 - 15
-const unsigned char addrId = 1;
+const unsigned char addrId = 6;
 
 
 
@@ -45,11 +47,18 @@ unsigned char parsePosition = 0;
 PS2Keyboard keyboard;
 
 void setup() {
-  delay(1000);
+  delay(500 + 500 * addrId);
+  
+  pinMode(led, OUTPUT);
+  digitalWrite(led, HIGH);
+  delay(250);
+  digitalWrite(led, LOW);  
+  
   keyboard.begin(DataPin, IRQpin);
   Serial.begin(115200);
    // initialize the digital pin as an output.
-  pinMode(led, OUTPUT);     
+  //pinMode(led, OUTPUT);
+  //digitalWrite(led, LOW);  
 }
 
 void parseInput(unsigned char b) {
@@ -81,12 +90,7 @@ void loop() {
   }
   
   if (keyboard.available()) {
-    /*
-    digitalWrite(led, HIGH);   // turn the LED on (HIGH is the voltage level)
-    delay(100);               // wait for a second
-    digitalWrite(led, LOW);    // turn the LED off by making the voltage LOW
-    delay(100);               // wait for a second
-    */
+    
     // read the next key
     char c = keyboard.read();
     

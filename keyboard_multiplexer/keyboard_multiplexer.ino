@@ -20,6 +20,8 @@ void setup() {
 }
 
 void parseInput(unsigned char b) {
+ Serial.print('h');
+ Serial.print(b);
  if (parsePosition == 0) {
    if (b > 0 && b <= 16) {
      parseAddr = b;

@@ -1,1 +1,0 @@
-/Applications/Internet/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --kiosk http://localhost:8888/index.html
