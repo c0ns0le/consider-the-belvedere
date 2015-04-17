@@ -282,13 +282,13 @@ Post.prototype.isBodyEmpty = function() {
 
 Post.prototype.deleteHeaderChar = function() {
     if (this.header.length) {
-        this.header = this.header.substr(this.header.length - 1);
+        this.header = this.header.substr(0, this.header.length - 1);
     }
 };
 
 Post.prototype.deleteBodyChar = function() {
     if (this.body.length) {
-        this.body = this.body.substr(this.body.length - 1);
+        this.body = this.body.substr(0, this.body.length - 1);
     }
 };
 
