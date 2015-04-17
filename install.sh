@@ -29,3 +29,4 @@ cat <<EOM >~/Library/LaunchAgents/considerthebelvedere.plist
 EOM
 
 chmod 755 $STARTUP
+chmod 755 ~/Library/LaunchAgents/considerthebelvedere.plist
