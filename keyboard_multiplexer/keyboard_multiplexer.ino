@@ -49,6 +49,7 @@ void writeFromAddr(int addr, char* buffer, int bufferSize) {
     for (int i = 0; i < bufferSize; ++i) {
       // TODO: need to check if its a shift or not based on the character
       int key = buffer[i];
+
       
       switch (key) {
         case 13: 
@@ -60,9 +61,11 @@ void writeFromAddr(int addr, char* buffer, int bufferSize) {
           break;
         case 9:
           key = KEY_TAB;
+          continue; // Prevent this so they can't jump around the page
           break;
         case 27:
           key = KEY_ESC;
+          continue; // Prevent this so they can't jump around the page
           break;
       }
       
