@@ -81,7 +81,22 @@ app.use(function(req, res, next) {
 db.serialize(function() {
   db.run('CREATE TABLE IF NOT EXISTS posts (id unique, user_column int, ts VARCHAR(255), header VARCHAR(255), body VARCHAR(2047))');
 });
+
  
+function backup() {
+
+  var time = Date.now();
+
+  var filename = '~/documents/ctb-backup-' + time + '.db';
+
+  console.log('backing up to:' + filename);
+
+  //if (!fs.existsSync(file)) {
+    childProcess.exec('cp dbfile.db ' + filename, function(err) {
+      console.log('err:' + err);
+    });
+  //}
+};
 
 
 if (useSuperCollider) {
@@ -150,6 +165,10 @@ if (useSuperCollider) {
 
 
 app.set('port', process.env.PORT || 8888);
+
+backup();
+
+setInterval(backup, 24 * 60 * 60 * 1000);
 
 var server = app.listen(app.get('port'), function() {
   console.log('Express server listening on port ' + server.address().port);

@@ -27,6 +27,7 @@ var Column = function(id, persister) {
     this.el.append(this.dummy);
     this.column.append(this.el);
     this.container.append(this.column);
+
     
     // Load posts from database.
     this.persister.load(id).then(function(posts) {
