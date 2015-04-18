@@ -3,7 +3,7 @@
 
 
 // 1 - 15
-const unsigned char addrId = 5;
+const unsigned char addrId = 3;
 
 
 
@@ -33,6 +33,11 @@ void setup() {
   keyboard.reset();
   
   lastReset = millis();
+  
+  delay(250);
+  digitalWrite(led, HIGH);
+  delay(250);
+  digitalWrite(led, LOW); 
 }
 
 void parseInput(unsigned char b) {
