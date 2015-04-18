@@ -18,9 +18,10 @@ html, body {
 }
 
 body { 
-    font: normal 20px/28px bodonixtregular,arial;  
+    font: normal 20px/28px bodonixtregular, 'Bodoni 72',serif;  
     background: black; 
     color: rgb(230, 0, 255);
+    letter-spacing: 0.75px;
 }
 
 
@@ -35,6 +36,7 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: 50% 50%;
+    z-index: 500;
 }
 
 .start-trans {
@@ -74,8 +76,7 @@ body {
 }
 
 .column .inner {
-    text-align: justify;
-    word-break: break-all;
+    
     box-sizing: border-box;
     padding: 0 5px;
     position: relative;
@@ -96,12 +97,15 @@ body {
 .column .post {
     box-sizing: border-box;
     -webkit-transform-style: preserve-3d;
+    text-align: justify;
+    word-break: break-word;
     left: 5px;
     top: 0px;
 }
 
 .column h2 {
     padding-bottom: 0.1em;
+    line-height: 1.07;
     margin: 0;
 }
 
@@ -112,6 +116,7 @@ body {
 .column p {
     padding: 0.5em 0 1.5em;
     margin: 0;
+    line-height: 1.2;
 }
 
 .columns {
@@ -136,6 +141,7 @@ body {
     margin-left:-221px;
     margin-top: -40px;
     z-index: 1000;
+    font-family: 'Marker Felt', 'Bodoni 72', 'bodonixtregular', sans-serif;
 }
 
 .zzz .z1,

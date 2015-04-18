@@ -95,12 +95,19 @@ PostView.prototype.setBody = function(text) {
 
 PostView.prototype.updateDate = function(time) {
     var date = new Date(+time);
+    var parts = date.toLocaleTimeString().split(':');
+    var time = '';
+    if (parts.length == 3) {
+        time = parts[0] + ':' + parts[1] + parts[2].substr(2);
+    } else {
+        time = parts.join(':');
+    }
     this.dateText = 
     ["January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"][date.getMonth()]
      + '  ' + date.getDate()
      + ', ' + date.getFullYear()
-     + ' ' + date.toLocaleTimeString();
+     + ' ' + time
     this.date.text(this.dateText);
 }
 
