@@ -3,7 +3,7 @@
 
 
 // 1 - 15
-const unsigned char addrId = 4;
+const unsigned char addrId = 5;
 
 
 
@@ -14,6 +14,7 @@ int led = 13;
 unsigned char parseAddr = 0;
 unsigned char parseByte = 0;
 unsigned char parsePosition = 0;
+long long lastReset = 0;
 
 
 PS2Keyboard keyboard;
@@ -30,6 +31,8 @@ void setup() {
   Serial.begin(115200);
   
   keyboard.reset();
+  
+  lastReset = millis();
 }
 
 void parseInput(unsigned char b) {
@@ -70,5 +73,8 @@ void loop() {
     // read the next key
     char c = keyboard.read();
     writeFromAddr(addrId, c);
+  } else if (millis() - lastReset > 3600000) {
+     lastReset = millis();
+     keyboard.reset(); 
   }
 }

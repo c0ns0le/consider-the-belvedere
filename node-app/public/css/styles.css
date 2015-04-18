@@ -18,10 +18,11 @@ html, body {
 }
 
 body { 
-    font: normal 20px/28px bodonixtregular, 'Bodoni 72',serif;  
+    font: normal 28px/28px bodonixtregular, 'Bodoni 72',serif;  
     background: black; 
     color: rgb(230, 0, 255);
-    letter-spacing: 0.75px;
+    letter-spacing: 1.5px;
+    text-rendering: optimizeLegibility;
 }
 
 
@@ -52,11 +53,13 @@ body {
     display: inline;
     border-right: 2px solid rgb(230, 0, 255);
     animation: blink 1s steps(2, start) infinite;
+    -webkit-animation: blink 1s steps(2, start) infinite;
 }
 
 .cursor.inactive {
     visibility: hidden;
     animation: none;
+    -webkit-animation: none;
     
 }
 
@@ -66,6 +69,11 @@ body {
   }
 }
 
+@-webkit-keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
 
 .column {
     position: absolute;
