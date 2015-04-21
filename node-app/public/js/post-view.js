@@ -53,7 +53,7 @@ PostView.dispose = function(view) {
  * @param {string} text
  */
 PostView.prototype.formatHtml = function(text) {
-    return text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/ /g, '&nbsp;').replace(/\r/g, '<br>');
+    return text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\r/g, '<br>');
 };
 
 /**

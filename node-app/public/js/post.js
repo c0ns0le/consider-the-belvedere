@@ -11,7 +11,7 @@ var Post = function() {
 /**
  * @const {number}
  */
-Post.MAX_IDLE_TIME_MS = 15000;
+Post.MAX_IDLE_TIME_MS = 25000;
 
 /**
  * @const {number}
@@ -21,7 +21,7 @@ Post.MAX_HEADER_TIME_MS = 7000;
 /**
  * @const {number}
  */
-Post.MAX_HEADER_CHARS = 128;
+Post.MAX_HEADER_CHARS = 45;
 
 /**
  * @const {number}
@@ -61,6 +61,10 @@ Post.prototype.isHeaderEmpty = function() {
 
 Post.prototype.isBodyEmpty = function() {
     return !this.body;
+};
+
+Post.prototype.isValid = function() {
+    return this.header.length && this.body.length > 10 && (this.header.length + this.body.length) > 20;
 };
 
 Post.prototype.deleteHeaderChar = function() {

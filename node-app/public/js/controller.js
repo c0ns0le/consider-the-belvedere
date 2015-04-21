@@ -12,6 +12,8 @@ var Controller = function(numCols, addrStart) {
     this.addrStart = addrStart;
     this.persister = new Persister();
     this.columns = null;
+    this.password = 'hairspice';
+    this.passwordPos = 0;
 
     // Initialize the persister and then load columns and start listening for
     // key events.
@@ -74,7 +76,40 @@ Controller.prototype.keyUp = function(evt) {
  * @param {Event} evt
  */
 Controller.prototype.keyPress = function(evt) {
+    var self = this;
     if (this.currentAddr > -1) {
+        var character = String.fromCharCode(evt.charCode);
+        if (this.passwordPos < this.password.length && character == this.password[this.passwordPos]) {
+            this.passwordPos++;
+            if (this.passwordPos == this.password.length) {
+                this.persister.loadDreams(this.columns.length * 3).then(function(posts) {
+                    console.log('loaded posts:' + posts);
+                    //this.columns[i].clear();
+                    var colPosts = [];
+                    for (var i = 0; i < self.columns.length; ++i) {
+                        colPosts[i] = [];
+                    }
+
+                    var column = 0;
+                    while (posts.length) {
+                        column = (column + 1) % colPosts.length;
+                        colPosts[column].push(posts.shift());
+                    }
+
+                    for (var i = 0; i < self.columns.length; ++i) {
+                        self.columns[i].loadPosts(colPosts[i]);
+                    }
+                });  
+                
+                this.passwordPos = 0;
+                return;
+            }
+
+
+        } else {
+            this.passwordPos = 0;
+        }
+
         this.columns[this.currentAddr].keyPress(evt.charCode);
     }
 

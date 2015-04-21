@@ -11,7 +11,13 @@ var Column = function(id, persister) {
     this.column = $('<div class="column">');
     this.el = $('<div class="inner">');
     this.dummy = $('<div class="dummy">');
+    this.cta = $('<div class="cta">');
     this.cursor = $('<div class="cursor inactive">');
+
+
+    this.ctaVisible = false;
+    this.ctaAnimation = -1;
+    this.ctaText = 'Time to type your dreams';
 
     this.active = false;
     this.persister = persister;
@@ -67,6 +73,32 @@ Column.prototype.startPost = function() {
     this.getCurrentPostView().headerContainer.append(this.cursor);
 };
 
+Column.prototype.showCta = function() {
+    if (!this.ctaVisible) {
+        var self = this;
+        var ctaPos = 0;
+        this.ctaAnimation = setInterval(function() {
+            var text = self.ctaText;
+            ctaPos = (ctaPos + 1) % 4;
+            for (var i = 0; i < ctaPos; ++i) {
+                text += '.';
+            }
+            self.cta.text(text);
+        }, 1000);
+        this.ctaVisible = true;
+        this.el.append(this.cta);
+    }
+};
+
+Column.prototype.hideCta = function() {
+    if (this.ctaVisible) {
+        clearInterval(this.ctaAnimation);
+        this.ctaAnimation = -1;
+        this.ctaVisible = false;
+        this.cta.remove();
+    }
+};
+
 Column.prototype.init = function() {
     this.startPost();
     // If a post is untouched for 15 seconds it is persisted and a new post
@@ -82,6 +114,7 @@ Column.prototype.init = function() {
             var time = Date.now();
             if (time - self.post.time > Post.MAX_IDLE_TIME_MS || (self.post.isFull())) {
                 self.persist();
+                self.showCta();
             }
         }
 
@@ -94,6 +127,10 @@ Column.prototype.init = function() {
     if (this.pruneInterval == -1) {
         this.pruneInterval = setInterval(function() {
             self.prune();
+            var time = Date.now();
+            if (time - self.post.time > Post.MAX_IDLE_TIME_MS) {
+                self.showCta();
+            }
         }, 2000);
     }
 };
@@ -118,6 +155,7 @@ Column.prototype.push = function(postView) {
  */
 Column.prototype.keyPress = function(charCode) {
     var time = Date.now();
+    this.hideCta();
 /*
     if (!this.post) {
         this.isHeader = true;
@@ -144,10 +182,18 @@ Column.prototype.keyPress = function(charCode) {
     if (this.isHeader && !this.post.isHeaderEmpty()) {
         if (
                 charCode == 13 || 
-                this.post.isHeaderFull() || 
                 this.post.getNumHeaderWords() >= this.numHeaderWords) {
             this.isHeader = false;
             this.getCurrentPostView().bodyContainer.append(this.cursor);
+        } else if (this.post.isHeaderFull()) {
+            var headerWords = this.post.header.split(/\s+/g);
+            if (headerWords.length > 1) {
+                this.post.body = headerWords.pop();
+                this.post.header = headerWords.join(' ');
+                this.getCurrentPostView().update(this.post);
+                this.isHeader = false;
+                this.getCurrentPostView().bodyContainer.append(this.cursor);
+            }
         }
     } 
 
@@ -226,10 +272,40 @@ Column.prototype.prune = function(opt_immediate) {
     }
 };
 
-Column.prototype.persist = function() {
-    this.persister.persist(this.post, this.id);
+Column.prototype.clear = function() {
+
+    while (this.postViews.length > 1) {
+        var postView = this.postViews.shift();
+        PostView.dispose(postView);
+    }
+
     this.post.reset();
-    this.startPost();
+    this.getCurrentPostView().update(this.post);
+};
+
+Column.prototype.loadPosts = function(posts) {
+    var self = this;
+    _.each(posts, function(postData) {
+        var postView = PostView.create();
+        var post = new Post();
+        post.set(postData);
+        postView.update(post);
+        self.push(postView);
+    });
+
+    this.prune(true);
+};
+
+Column.prototype.persist = function() {
+    if (this.post.isValid()) {
+        this.persister.persist(this.post, this.id);
+        this.post.reset();
+        this.startPost();
+    } else {
+        this.isHeader = true;
+        this.post.reset();
+        this.getCurrentPostView().update(this.post);
+    }
 };
 
 Column.prototype.keyBack = function() {

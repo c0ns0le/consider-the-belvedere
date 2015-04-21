@@ -31,6 +31,19 @@ Persister.prototype.load = function(id) {
     return deferred.promise();
 };
 
+Persister.prototype.loadDreams = function(count) {
+    var deferred = $.Deferred();
+
+    // Choose 10 some random posts
+    var posts = _.clone(OLD_DREAMS.dreams);
+
+    var total = Math.min(count, posts.length);
+    var shuffled = _.shuffle(posts);
+    deferred.resolve(shuffled.slice(0, total));
+
+    return deferred.promise();
+};
+
 /**
  * Persists a post to a given column id.
  * @param {Post} post
