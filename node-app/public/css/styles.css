@@ -18,7 +18,7 @@ html, body {
 }
 
 body { 
-    font: normal 32px/32px bodonixtregular, 'Bodoni 72',serif;  
+    font: normal 28px/28px bodonixtregular, 'Bodoni 72',serif;  
     background: black; 
     color: rgb(230, 0, 255);
     letter-spacing: 1.5px;

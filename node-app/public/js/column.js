@@ -294,6 +294,7 @@ Column.prototype.loadPosts = function(posts) {
     });
 
     this.prune(true);
+    this.hideCta();
 };
 
 Column.prototype.persist = function() {
