@@ -23,6 +23,7 @@ body {
     color: rgb(230, 0, 255);
     letter-spacing: 1.5px;
     text-rendering: optimizeLegibility;
+    overflow: hidden;
 }
 
 
