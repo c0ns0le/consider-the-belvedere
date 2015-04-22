@@ -3,9 +3,9 @@ var OLD_DREAMS = {
     // Column 1
     [
       {
-        header: 'Over The Hedge',
-        time: new Date('November 18, 2014').getTime(),
-        body: 'On a beautiful beach making a film. Hedges and an outdoor cabin. Panning through the hedges eventually ending up on the beach. I dipped my hands in the sand and looked up. A giant tidal wave was coming in but the beach became my house and I didn’t know what to save. I started running from the wave but then realized my dream diary was back there. I ran back and tried to save it. I wanted to keep everything. The bedside table was there (a box) and I piled it full of books, not knowing where my dream diary was exactly.'
+        header: 'The case of the red earring',
+        time: new Date('November 27, 2014').getTime(),
+        body: 'Description of murder overheard while combo parking bike and car. Boy on porch bragging about it while trying to close the clasp of his earring. A really close up view of red beads touching red beads.'
       },
       {
         header: 'Radical Laundry',
@@ -18,19 +18,19 @@ var OLD_DREAMS = {
         body: 'Lesbian Movie- Two notorious actresses are about to consummate their love. Except it’s real and it’s dangerous. She could be a vampire. And when the cops show up, you expect the worse.'
       },
       {
-        header: 'DUSTING THE BOILER',
-        time: new Date('January 3, 2015').getTime(),
-        body: 'Alleyway: 8 black kittens kneading a blanket on a bed. A large orange cat comes in who is not a rival cat to the kittens. It jumps and bounces on the bed so the kittens are mid air and the fat cat grips the head board with its claws. A large truck pulls up. It has on the back of it a giant plastic version of the Belvedere boiler cast in a crystal clear material. A crowd of people unload it from the tow truck and start to dust it with feather dusters. The kittens crawl cutely towards the big boiler as though it is their mom, leaving big fat cat on the headboard while they take their places in its coal holes.'
+        header: 'Old Hag visits during alien operation',
+        time: new Date('January 1, 2015').getTime(),
+        body: 'Old hag visit \nAlien operation\n3 photographs of evidence\n4 legs\n4 hands\nWedding rings on all of them\nForeign sneakers on a boat'
       },
       {
-        header: 'ONLY WHITE SPIDERS MOVE BACKWARDS',
-        time: new Date('September 14, 2013').getTime(),
-        body: 'INT. Standing in a tiled floor room beside a row of washing machines. I have many things to put in and then a woman comes along who is elderly and has one sweater that appears to be chainmail. It takes priority as it’s one and not many, so I put my things aside. As she continues with the washing machine I pass the machine and notice a steamer. I start to steam the floors, then the machine stops. TONY comes and says the debit/visa is broken down and he rips one off a self checkout station and plugs it into the steamer and it starts working again. INT. domestic house setting. I’m there to battle another force.I have my body suited up like Matt Damon in Elysium. Im laying in bed with Mia and there’s a broken mirror on the floor beside us. She takes a photo of our reflection with her IPhone and shows it to me. I lay on my back and look up to the ceiling- a white bunch of material unravels and drops itself. It looks like silk or a gauze textile. Mia whispers, “Only white spiders Move backwards.”'
+        header: 'Pew Views',
+        time: new Date('July 7, 2014').getTime(),
+        body: 'Got the film back. The end was cut at an orb, on the right and a female figure on the left. “Wheres the beginning?” \nINT. B.W’S SHOW at Peres. There are concrete pews and a lot of weavings.'
       },
       {
-        header: 'PRE-INTERVIEW TRAP, POST-INTERVIEW SMEAR',
-        time: new Date('March 31, 2015').getTime(),
-        body: 'V and I owned an extra apartment attic. There is a laZboy and Giant bug trap in the living room, littered with white bug shells. SF makes inspection of the bug trap. I woke up way too early with no coffee. He  knows where the coffee is but we have to walk through the landlords bedroom and they are still in their pajamas. Walk turns into some tourist group tour. I find ridiculous baby shirts for my niece. A search for the women’s washroom leads to a job interview. Unidentifiable institution but we’re just hanging out. Topic turns to cocaine and I understand we are in Holland. Job interviewer presents me with a beautiful card at the end, she made for me with thick gobs of lipstick. I touch it and it smears.'
+        header: 'MISSING',
+        time: new Date('December 13, 2014').getTime(),
+        body: 'Bookbag side pouch. 5 black clothed full ninja surround and steal the mexican souvenir miniature crab keychain and harmonica.'
       },
       {
         header: 'DARN YOU MR. NICHOLSON!',
@@ -48,9 +48,64 @@ var OLD_DREAMS = {
         body: 'Bookbag side pouch. 5 black clothed full ninja surround and steal the mexican souvenir miniature crab keychain and harmonica.'
       },
       {
-        header: 'FORGOTTEN COB BOBBLE HEAD',
-        time: new Date('October 5, 2013').getTime(),
-        body: 'Realtor character offers to give me work digging a pool. He keeps wanting to hang out with V and I. We dress up and wear matching pirate school uniform plaid skirts. Going on a walk we forget our corn cob garbage behind. Continuing on we see some figurative kinetic public art. Its a family sleeping. The man is perfectly still, the wife is tossing and turning. The baby is doing the happy baby pose. It’s feet just off balance on it’s legs like a bobble head doll. They fall off and we can’t find them.'
+        header: 'Glass Orb Illumination',
+        time: new Date('August 8, 2013').getTime(),
+        body: 'Glass blowing in middle of night. Some medieval version of the glass co-op but learning a lot of techniques and asking a lot of questions. Our instructor was making a giant orb with wings but it looked like the ugliest thing I’ve ever seen.'
+      },
+      {
+        header: 'Orange Secrets of Crystal Skull',
+        time: new Date('May 15, 2013').getTime(),
+        body: 'At an art show, there was a sculpture on the ground a strange mechanical orange. But when you lifted off the top you realized it was a crystal skull with an orange rind coating on the inside some kind of rolodex rotary phone.'
+      },
+      {
+        header: 'BLOOD WORK PT. 2 - THE JESTER RETURNS',
+        time: new Date('June 3, 2013').getTime(),
+        body: 'BLOOD WORK: now that’s a good movie! Im holding a small painting of a figure, a jester, clad in black, surrounded with brilliant colours, constructivist in style. I have to stay here for a while.'
+      },
+      {
+        header: 'SHOPPING EXTRAVAGANZA',
+        time: new Date('April 31, 2014').getTime(),
+        body: 'Shopping through aisles. On the back of a man. He tries on a hello kitty midriff shirt. “Are you sure? That one?" “Hello kitty?”'
+      },
+      {
+        header: 'Eternal Bistro',
+        time: new Date('May 10, 2014').getTime(),
+        body: 'Bistro tables connected in an infinity shape designed to be eyeglasses.\nAn island: Bozan Island. Important they said, look it up when you wake up. John Murchie wearing a sweatshirt edition: Tammy sweatshirt.'
+      },
+      {
+        header: 'Wasted Bag Pizza Hackers',
+        time: new Date('July 26, 2014').getTime(),
+        body: 'Bag too full and bursting, overflowing. Parallel parking it on the sidewalk like a car. At the pizza bar getting wasted, usb sticks for sale. Hacker themed staff members.'
+      },
+      {
+        header: 'Ant Snake Glasses',
+        time: new Date('April 30, 2013').getTime(),
+        body: 'Jesse reached forward and pulled a flying ant from my hair. Then I turned around and saw a snake leaning mid air across my shoulders. It was light yellow and white shiny with wisps of fluff and crystals coming out of it. I wasn’t scared of it but I looked at it’s tag and saw a gas symbol. I got worried the snake was explosive.'
+      },
+      {
+        header: 'Island of Bottles',
+        time: new Date('July 7, 2014').getTime(),
+        body: 'La bouteilles island. Tamara and I wanted to row there and trying to figure out all the possibilities. The current was very fast so it was going to launch our row boat out there. Graffiti haida cardboard box. Apparently this island was clear cut before and all culture and ecosystems were devastated.'
+      },
+      {
+        header: 'Chiaroscuro Maraschino',
+        time: new Date('September 24, 2013').getTime(),
+        body: 'Sloopy chair close up view on the side with straight edges. I’m rebuilding and building again as though it was disappearing constantly. RS suggests if we light it chiaroscuro it will be present just as intended: A champagne maraschino coloured cherry flavor.'
+      },
+      {
+        header: 'Two Robin Hoods',
+        time: new Date('June 13, 2013').getTime(),
+        body: 'Pirates Ship in bay, I had a ship too and steered it over to meet the other all white ghost ship. Captain was chasing us through bog to steal hard drive from underwater corpse. Then made us put on baby diaper for long runs.'
+      },
+      {
+        header: 'Twilight Hour Shrink',
+        time: new Date('August 17, 2014').getTime(),
+        body: 'EXT. BEACH at twilight hour. The two on the side of me: one shapeshifts to a very small version of himself. He has a tail,“Hey! How come at this time of day I shrink?” Recording devices are everywhere.'
+      },
+      {
+        header: 'SWAMP BREAD',
+        time: new Date('May 3, 2013').getTime(),
+        body: 'Jo and Wesley are at my place (east 15th)\nBread edition in the kitchen. Swamp bread. Green and white. Another change, green.'
       }
     ]
 

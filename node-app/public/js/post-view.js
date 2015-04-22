@@ -60,7 +60,7 @@ PostView.prototype.formatHtml = function(text) {
  * Resets the PostView so it can be reused.
  */
 PostView.prototype.reset = function() {
-    this.container.css({'position': '', 'width': '', 'height': '', 'transform':'', 'opacity': ''});
+    this.container.css({'display': '', 'position': '', 'width': '', 'height': '', 'transform':'', 'opacity': ''});
     this.container.removeClass('start-trans');
     this.setHeader('');
     this.setBody('');
@@ -94,6 +94,7 @@ PostView.prototype.setBody = function(text) {
 };
 
 PostView.prototype.updateDate = function(time) {
+    console.log('updating post with time:' + time);
     var date = new Date(+time);
     var parts = date.toLocaleTimeString().split(':');
     var time = '';

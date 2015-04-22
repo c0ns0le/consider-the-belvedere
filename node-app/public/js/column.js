@@ -3,16 +3,19 @@
  * @param {number} id
  * @param {Persister} persister
  */
-var Column = function(id, persister) {
+var Column = function(id, persister, delegate) {
     var self = this;
     this.id = id;
 
+    this.delegate = delegate;
     this.container = $('<div class="column-container">');
     this.column = $('<div class="column">');
     this.el = $('<div class="inner">');
     this.dummy = $('<div class="dummy">');
     this.cta = $('<div class="cta">');
     this.cursor = $('<div class="cursor inactive">');
+    this.password = 'hairspice';
+    this.passwordPos = 0;
 
 
     this.ctaVisible = false;
@@ -42,7 +45,7 @@ var Column = function(id, persister) {
         posts.reverse();
 
         _.each(posts, function(postData) {
-
+            console.log('loaded post with time:' + postData.time);
             var postView = PostView.create();
             var post = new Post();
             post.set(postData);
@@ -77,6 +80,7 @@ Column.prototype.showCta = function() {
     if (!this.ctaVisible) {
         var self = this;
         var ctaPos = 0;
+        this.getCurrentPostView().container[0].style.display = 'none';
         this.ctaAnimation = setInterval(function() {
             var text = self.ctaText;
             ctaPos = (ctaPos + 1) % 4;
@@ -92,6 +96,7 @@ Column.prototype.showCta = function() {
 
 Column.prototype.hideCta = function() {
     if (this.ctaVisible) {
+        this.getCurrentPostView().container[0].style.display = '';
         clearInterval(this.ctaAnimation);
         this.ctaAnimation = -1;
         this.ctaVisible = false;
@@ -149,6 +154,22 @@ Column.prototype.push = function(postView) {
     this.el.append(postView.container);
 };
 
+Column.prototype.testPassword = function(charCode) {
+    var character = String.fromCharCode(charCode);
+    if (this.passwordPos < this.password.length && character == this.password[this.passwordPos]) {
+        this.passwordPos++;
+        if (this.passwordPos == this.password.length) {
+            this.passwordPos = 0;
+            this.post.reset();
+            this.getCurrentPostView().update(this.post);
+            this.delegate.loadDreams();
+            return true;
+        }
+    } else {
+        this.passwordPos = 0;
+    }
+};
+
 /**
  * Keypress handler received from controller. Reads the character code and 
  * appends the proper string to the current postview.
@@ -156,22 +177,10 @@ Column.prototype.push = function(postView) {
 Column.prototype.keyPress = function(charCode) {
     var time = Date.now();
     this.hideCta();
-/*
-    if (!this.post) {
-        this.isHeader = true;
-        this.numHeaderWords = 2 + (Math.random() * 2 | 0);
 
-        this.post = {
-            time: time,
-            header: '',
-            body: ''
-        };
-
-        this.push(this.postEl = PostView.create());
-    } else {
-        this.post.time = time;
+    if (this.testPassword(charCode)) {
+        return;
     }
-    */
 
     var prevPostTime = this.post.time;
     this.post.time = time;

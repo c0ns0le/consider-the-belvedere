@@ -83,7 +83,7 @@ Post.prototype.set = function(post) {
     this.reset();
     this.header = post && post.header ? post.header : '';
     this.body = post && post.body ? post.body : '';
-
+    this.time = post && post.time ? post.time : Date.now();
 };
 
 /**
