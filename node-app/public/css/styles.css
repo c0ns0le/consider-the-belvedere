@@ -106,6 +106,7 @@ body {
 .column .post {
     box-sizing: border-box;
     -webkit-transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
     text-align: justify;
     word-wrap: break-word;
     white-space: pre-wrap;

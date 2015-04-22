@@ -64,7 +64,7 @@ Post.prototype.isBodyEmpty = function() {
 };
 
 Post.prototype.isValid = function() {
-    return this.header.length && this.body.length > 10 && (this.header.length + this.body.length) > 20;
+    return this.header.length && this.body.length > 10 && (this.header.length + this.body.length) > 15;
 };
 
 Post.prototype.deleteHeaderChar = function() {

@@ -45,7 +45,6 @@ var Column = function(id, persister, delegate) {
         posts.reverse();
 
         _.each(posts, function(postData) {
-            console.log('loaded post with time:' + postData.time);
             var postView = PostView.create();
             var post = new Post();
             post.set(postData);
