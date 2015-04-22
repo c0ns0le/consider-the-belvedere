@@ -248,7 +248,7 @@ Column.prototype.keyPress = function(charCode) {
 Column.prototype.prune = function(opt_immediate) {
     var self = this;
     if (this.pruning) return;
-    if (this.postViews.length > 1 && this.el.height() >= $('.columns').height() * 0.9) {
+    if (this.postViews.length > 1 && this.el.height() >= $('.columns').height() * 0.95) {
         // TODO: Animate it away
         var postView = this.postViews.shift();
 
