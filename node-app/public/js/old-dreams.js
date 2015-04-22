@@ -106,6 +106,21 @@ var OLD_DREAMS = {
         header: 'SWAMP BREAD',
         time: new Date('May 3, 2013').getTime(),
         body: 'Jo and Wesley are at my place (east 15th)\nBread edition in the kitchen. Swamp bread. Green and white. Another change, green.'
+      },
+      {
+        header: 'HIPPIE NUDE BEACH PRINTS',
+        time: new Date('September 9, 2014').getTime(),
+        body: 'I am sometimes in a state of half undress myself.'
+      },
+      {
+        header: 'MOROCCAN FOOTAGE LOST FOREVER',
+        time: new Date('December 22, 2014').getTime(),
+        body: 'We go away with the unpaid ticket towards a hotel.'
+      },
+      {
+        header: 'Fruit Punch A la surfer',
+        time: new Date('December 25, 2013').getTime(),
+        body: 'EXT. Aerial Perspective. Trapped on Honshu. Im a big giant long legs spider but only two sticks for legs cartoon.'
       }
     ]
 
