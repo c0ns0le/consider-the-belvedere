@@ -80,7 +80,7 @@ var OLD_DREAMS = {
       {
         header: 'Ant Snake Glasses',
         time: new Date('April 30, 2013').getTime(),
-        body: 'Jesse reached forward and pulled a flying ant from my hair. Then I turned around and saw a snake leaning mid air across my shoulders. It was light yellow and white shiny with wisps of fluff and crystals coming out of it. I wasn’t scared of it but I looked at it’s tag and saw a gas symbol. I got worried the snake was explosive.'
+        body: 'Jesse reached forward and pulled a flying ant from my hair. Then I turned around and saw a snake leaning mid air across my shoulders. It was light yellow and white shiny with wisps of fluff and crystals coming out of it.'
       },
       {
         header: 'Island of Bottles',

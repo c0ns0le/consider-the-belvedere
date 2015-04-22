@@ -222,8 +222,7 @@ Column.prototype.keyPress = function(charCode) {
             }
         } else {
             if (charCode == 13 && this.post.body.length > 2 && 
-                    this.post.body[this.post.body.length - 1] == '\r' &&
-                    this.post.body[this.post.body.length - 2] == '\r') {
+                    this.post.body[this.post.body.length - 1] == '\r') {
                 shouldPersist = true;
             }
         }
