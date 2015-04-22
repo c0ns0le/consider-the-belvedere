@@ -286,7 +286,7 @@ Column.prototype.clear = function() {
 Column.prototype.loadPosts = function(posts) {
     var self = this;
 
-    this.getCurrentPostView().remove();
+    this.getCurrentPostView().container.remove();
 
     _.each(posts, function(postData) {
         var postView = PostView.create();
@@ -299,7 +299,7 @@ Column.prototype.loadPosts = function(posts) {
     this.prune(true);
     this.hideCta();
 
-    this.el.append(this.getCurrentPostView());
+    this.el.append(this.getCurrentPostView().container);
 };
 
 Column.prototype.persist = function() {
