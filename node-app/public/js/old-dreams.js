@@ -10,7 +10,7 @@ var OLD_DREAMS = {
       {
         header: 'Radical Laundry',
         time: new Date('November 10, 2013').getTime(),
-        body: 'Some kind of CBC documentary about theatres. Extremely candid, radical style. interviews university students about doing laundry. They ask interviewer if he “loves it here”, a little aside he thinks. “I don’t spend any time down here.” then through the fence we spot a camera person dollying a huge film camera filming through a football match to some russian male dancers, traditional russian dance both in perfect formation.'
+        body: 'Some kind of CBC documentary about theatres. Extremely candid, radical style. interviews university students about doing laundry.'
       },
       {
         header: 'Yet Another Lesbo-Vamp Plot Line',
@@ -35,7 +35,7 @@ var OLD_DREAMS = {
       {
         header: 'DARN YOU MR. NICHOLSON!',
         time: new Date('January 16, 2014').getTime(),
-        body: 'Jack Nicholson is exterminator who visits hotel for job (ruining Tamara and I’s idea for movie) Bartender Maitre D. nicholson turns into my mom at some point, who I suspect of having an affair with the hotel owner. Why else would she get a job doing this? She is wearing 12 year old boy clothes and it’s pouring rain but this is a memory of the last time she visited.'
+        body: 'Jack Nicholson is exterminator who visits hotel for job (ruining Tamara and I’s idea for movie) Bartender Maitre D. nicholson turns into my mom at some point.'
       },
       {
         header: 'BELVEDERE CLOWN PESTS',
