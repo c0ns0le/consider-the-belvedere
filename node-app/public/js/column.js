@@ -15,6 +15,14 @@ var Column = function(id, persister, delegate) {
     this.cta = $('<div class="cta">');
     this.cursor = $('<div class="cursor inactive">');
     this.password = 'hairspice';
+
+    this.passwords = [{password: 'hairspice', pos:0, cb:function() {
+        self.delegate.loadDreams();
+    }}, {password:'fullscreenx', pos:0, cb: function() {
+        var el = document.documentElement;
+        el.webkitRequestFullScreen();
+    }}];
+   // this.fullScreenPassword = 'fullscreenx';
     this.passwordPos = 0;
 
 
@@ -155,17 +163,22 @@ Column.prototype.push = function(postView) {
 
 Column.prototype.testPassword = function(charCode) {
     var character = String.fromCharCode(charCode);
-    if (this.passwordPos < this.password.length && character == this.password[this.passwordPos]) {
-        this.passwordPos++;
-        if (this.passwordPos == this.password.length) {
-            this.passwordPos = 0;
-            this.post.reset();
-            this.getCurrentPostView().update(this.post);
-            this.delegate.loadDreams();
-            return true;
+
+    for (var i = 0; i < this.passwords.length; ++i) {
+        var password = this.passwords[i].password;
+        var pos = this.passwords[i].pos;
+        if (pos < password.length && character == password[pos]) {
+            this.passwords[i].pos++;
+            if (this.passwords[i].pos == password.length) {
+                this.passwords[i].pos = 0;
+                this.post.reset();
+                this.getCurrentPostView().update(this.post);
+                this.passwords[i].cb();
+                return true;
+            }
+        } else {
+            this.passwords[i].pos = 0;
         }
-    } else {
-        this.passwordPos = 0;
     }
 };
 

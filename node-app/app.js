@@ -170,19 +170,57 @@ backup();
 
 setInterval(backup, 24 * 60 * 60 * 1000);
 
-var server = app.listen(app.get('port'), function() {
-  console.log('Express server listening on port ' + server.address().port);
+function launchChrome() {
   console.log('launching chrome...');
-
   var exists = fs.existsSync('/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome');
 
   if (exists) {
-    childProcess.exec('/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --kiosk http://localhost:8888/', function(err) {
+    childProcess.exec('/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --kiosk --incognito http://localhost:8888/', function(err) {
       console.log('err:' + err);
     });
   } else {
-    console.log('cant find google chrome.');
+    var exists = fs.existsSync('/Applications/Internet/Google\ Chrome.app/Contents/MacOS/Google\ Chrome');
+
+    if (exists) {
+      childProcess.exec('/Applications/Internet/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --kiosk --incognito http://localhost:8888/', function(err) {
+        console.log('err:' + err);
+      });
+    } else {
+      console.log('cant find google chrome.');
+    }
   }
+}
+
+function killChrome() {
+  console.log('killing chrome');
+  //killall -9 "Google Chrome"
+  childProcess.exec('killall -9 "Google Chrome"', function(err) {
+    console.log('error killing chrome:' + err);
+  });
+}
+
+var server = app.listen(app.get('port'), function() {
+  console.log('Express server listening on port ' + server.address().port);
+  launchChrome();
+
+  var lastRefresh = new Date().getTime();
+  
+  // Every hour we check to see if we should refresh full screen.
+  setInterval(function() {
+    var date = new Date();
+    var hour = date.getHours();
+
+    // Only refresh in the morning between 3 and 7
+    if (hour > 3 && hour < 7) {
+      var time = date.getTime();
+      // Refresh every 6 hours
+      if (time - lastRefresh > (6 * 60 * 60 * 1000)) {
+        lastRefresh = time;
+        killChrome();
+        setTimeout(launchChrome, 10000);
+      }
+    }
+  }, 1 * 60 * 60 * 1000);
 });
 
 
