@@ -25,6 +25,7 @@ var Column = function(id, persister, delegate) {
    // this.fullScreenPassword = 'fullscreenx';
     this.passwordPos = 0;
 
+    this.lastAutoSuggest = '';
 
     this.ctaVisible = false;
     this.ctaAnimation = -1;
@@ -182,6 +183,38 @@ Column.prototype.testPassword = function(charCode) {
     }
 };
 
+Column.prototype.autoSuggest = function() {
+    // Current word
+    var blurb = this.post.header;
+    if (this.post.body.length) {
+        if (blurb.length) {
+            blurb += ' ';
+        }
+        blurb += this.post.body;
+    }
+
+    var allWords = blurb.split(/\W+/);
+    var lastWord = '';
+
+    // Pop off any garbage
+    while (allWords.length) {
+        lastWord = allWords.pop().replace(/^\W+|\W+$/gm, '');
+        if (lastWord.length) {
+            break;
+        }
+    }
+
+    if (lastWord == '' || lastWord == this.lastAutoSuggest) {
+        return;
+    }
+
+    this.lastAutoSuggest = lastWord;
+
+    $.get('/suggest/' + lastWord, function(response) {
+        console.log('got response:' + response);
+    });
+};
+
 /**
  * Keypress handler received from controller. Reads the character code and 
  * appends the proper string to the current postview.
@@ -247,6 +280,8 @@ Column.prototype.keyPress = function(charCode) {
             this.getCurrentPostView().setBody(this.post.body);
         }
     }
+
+    this.autoSuggest();
 
     if (!this.active) {
         this.active = true;

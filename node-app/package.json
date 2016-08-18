@@ -9,7 +9,6 @@
     "express": "~4.9.0",
     "sqlite3": "^3.0.1",
     "sequelize": "2.0.4",
-    "supercolliderjs": "*",
     "body-parser": "*"
   },
   "devDependencies": {
