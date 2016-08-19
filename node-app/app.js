@@ -95,7 +95,7 @@ app.use(function(req, res, next) {
 db.serialize(function() {
   db.run('CREATE TABLE IF NOT EXISTS posts (id unique, user_column int, ts VARCHAR(255), header VARCHAR(255), body VARCHAR(2047))');
 //
-  db.run('CREATE TABLE IF NOT EXISTS words (id unique, first_word VARCHAR(32), second_word VARCHAR(32), count int)');
+  db.run('CREATE TABLE IF NOT EXISTS words (first_word VARCHAR(255), second_word VARCHAR(255), count int, UNIQUE(first_word, second_word) ON CONFLICT REPLACE)');
 });
 
 function storePostWords(post) {
@@ -107,11 +107,45 @@ function storePostWords(post) {
     return word.length > 0;
   });
 
-  for (var i = 0; i < allWords.length - 1; i++) {
-    var firstWord = allWords[i];
-    var secondWord = allWords[i+1];
-    console.log('Add word pair:' + firstWord + ', ' + secondWord);
-  }
+  var stmt;
+  var index = -1;
+  var runNext = function() {
+    if (++index >= allWords.length - 1) {
+      return;
+    }
+
+    stmt.run({$first_word: allWords[index], $second_word: allWords[index + 1]}, 
+      function(err) {
+        if (!err) {
+          console.log('saved ');
+          runNext();
+        } else {
+          console.log('got error ' + err);
+        }
+      });
+  };
+
+
+  stmt = db.prepare("INSERT OR REPLACE INTO words (first_word, second_word, count) VALUES($first_word, $second_word, COALESCE((SELECT count + 1 FROM words WHERE first_word=$first_word AND second_word=$second_word), 1))", 
+    function (err) {
+      if (err) {
+        console.log('error prepping stmt');
+        return;
+      }
+
+      runNext();
+    });
+}
+
+function storeWordPair(stmt, firstWord, secondWord) {
+  stmt.run({$first_word: firstWord, $second_word: secondWord}, 
+  function(stmtErr) {
+    if (stmtErr) {
+      console.log('Error storing word pair:' + firstWord + ', ' + secondWord + ' : ' + stmtErr);
+    } else {
+      console.log('Stored ' + firstWord + ', ' + secondWord);
+    }
+  });
 }
 
 function suggestWord(word) {
