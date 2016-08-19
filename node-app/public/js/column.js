@@ -26,6 +26,9 @@ var Column = function(id, persister, delegate) {
     this.passwordPos = 0;
 
     this.lastAutoSuggest = '';
+    this.lastAutoSuggestTimeMS = 0;
+    this.lastSuccessfulAutoSuggestTimeMS = 0;
+    this.autoSuggestTimeout = -1;
 
     this.ctaVisible = false;
     this.ctaAnimation = -1;
@@ -45,6 +48,9 @@ var Column = function(id, persister, delegate) {
     this.el.append(this.dummy);
     this.column.append(this.el);
     this.container.append(this.column);
+
+    this.dreamEl = $('<div class="dream-cloud">');
+    this.column.append(this.dreamEl);
 
     
     // Load posts from database.
@@ -183,8 +189,29 @@ Column.prototype.testPassword = function(charCode) {
     }
 };
 
+Column.prototype.displayAutoSuggest = function(text) {
+    this.dreamEl.text(text);
+    this.dreamEl.show();
+}
+
 Column.prototype.autoSuggest = function() {
-    // Current word
+    var self = this;
+
+    // If we received a suggestion response, don't request another one for 
+    // 5 seconds. Also don't do requests faster than 2.5 seconds apart.
+    var t = new Date().getTime();
+    if (t - this.lastSuccessfulAutoSuggestTimeMS < 5000 || t - this.lastAutoSuggestTimeMS < 2500) {
+        clearTimeout(this.autoSuggestTimeout);
+        this.autoSuggestTimeout = setTimeout(function() {
+            self.autoSuggest();
+        }, 2500);
+        console.log('Waiting...');
+        return;
+    }
+
+
+    // Extract the current word from the whole text
+    // TODO: might be a faster way to do this.
     var blurb = this.post.header;
     if (this.post.body.length) {
         if (blurb.length) {
@@ -204,14 +231,22 @@ Column.prototype.autoSuggest = function() {
         }
     }
 
-    if (lastWord == '' || lastWord == this.lastAutoSuggest) {
+    if (lastWord.length < 2 || lastWord == this.lastAutoSuggest) {
         return;
     }
 
     this.lastAutoSuggest = lastWord;
 
+    clearTimeout(this.autoSuggestTimeout);
+    this.autoSuggestTimeout = -1;
+    this.lastAutoSuggestTimeMS = t;
+
+   
     $.get('/suggest/' + lastWord, function(response) {
-        console.log('got response:' + response);
+        if (response && response.length > 0) {
+            self.lastSuccessfulAutoSuggestTimeMS = new Date().getTime();
+            self.displayAutoSuggest(response);
+        }
     });
 };
 

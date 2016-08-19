@@ -76,6 +76,15 @@ body {
   }
 }
 
+.column .dream-cloud {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 120%;
+    border: 1px solid red;
+    color: #ffffff;
+}
+
 .column {
     position: absolute;
     left: 0;
@@ -154,7 +163,7 @@ body {
     margin-left:-221px;
     margin-top: -40px;
     z-index: 1000;
-    font-family: 'Marker Felt', 'Bodoni 72', 'bodonixtregular', sans-serif;
+    font-family: 'Marker Felt', 'Comic Neue', 'Comic Sans', 'TSCu_Comic', 'Comic Sans MS', cursive, sans-serif;
 }
 
 .zzz .z1,

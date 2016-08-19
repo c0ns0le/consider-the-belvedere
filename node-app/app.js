@@ -8,6 +8,9 @@ var app = express();
 var sqlite3 = require('sqlite3').verbose();
 var _ = require('lodash');
 
+var autoSuggest = require('./autoSuggest');
+var settings = require('./settings');
+
 
 var fs = require("fs");
 var file = "dbfile.db";
@@ -30,7 +33,11 @@ app.post('/posts/:colId',
     var body = req.body.body;
 
     // Store the post words
-    storePostWords(header + ' ' + body);
+    autoSuggest.storeText(db, header + ' ' + body, function(err) {
+      if (err) {
+        console.log("Error storing post words:" + err);
+      }
+    });
 
     var stmt = db.prepare('INSERT INTO posts (user_column, ts, header, body) VALUES (?,?,?,?)',
         function(err) {
@@ -73,8 +80,16 @@ app.get('/posts/:colId',
 app.get('/suggest/:word',
   function(req, res) {
     var word = req.param('word');
-    var response = suggestWord(word);
-    res.send({"a":response});
+    autoSuggest.suggest(db, word,
+      function(err, seq) {
+        if (err) {
+          console.log('Error with autosuggest ' + err);
+          res.send('');
+          return;
+        }
+
+        res.send(seq.join(' '));
+      });
   });
 
 
@@ -94,106 +109,51 @@ app.use(function(req, res, next) {
 // Setup database on first run.
 db.serialize(function() {
   db.run('CREATE TABLE IF NOT EXISTS posts (id unique, user_column int, ts VARCHAR(255), header VARCHAR(255), body VARCHAR(2047))');
-//
-  db.run('CREATE TABLE IF NOT EXISTS words (first_word VARCHAR(255), second_word VARCHAR(255), count int, UNIQUE(first_word, second_word) ON CONFLICT REPLACE)');
+  autoSuggest.initDB(db);
 });
 
-function storePostWords(post) {
-  var allWords = _.map(post.split(/\W+/), function(word) {
-    return word.replace(/^\W+|\W+$/gm, '').toLowerCase();
-  });
 
-  allWords = _.filter(allWords, function(word) {
-    return word.length > 0;
-  });
-
-  var stmt;
-  var index = -1;
-  var runNext = function() {
-    if (++index >= allWords.length - 1) {
-      return;
-    }
-
-    stmt.run({$first_word: allWords[index], $second_word: allWords[index + 1]}, 
-      function(err) {
-        if (!err) {
-          console.log('saved ');
-          runNext();
-        } else {
-          console.log('got error ' + err);
-        }
-      });
-  };
-
-
-  stmt = db.prepare("INSERT OR REPLACE INTO words (first_word, second_word, count) VALUES($first_word, $second_word, COALESCE((SELECT count + 1 FROM words WHERE first_word=$first_word AND second_word=$second_word), 1))", 
-    function (err) {
-      if (err) {
-        console.log('error prepping stmt');
-        return;
-      }
-
-      runNext();
-    });
-}
-
-function storeWordPair(stmt, firstWord, secondWord) {
-  stmt.run({$first_word: firstWord, $second_word: secondWord}, 
-  function(stmtErr) {
-    if (stmtErr) {
-      console.log('Error storing word pair:' + firstWord + ', ' + secondWord + ' : ' + stmtErr);
-    } else {
-      console.log('Stored ' + firstWord + ', ' + secondWord);
-    }
-  });
-}
-
-function suggestWord(word) {
-  console.log('suggest word: ' + word);
-  return 'a suggestion';
-}
  
 function backup() {
 
   var time = Date.now();
 
-  var filename = '~/documents/ctb-backup-' + time + '.db';
+  var filename = settings.backupDir + 'ctb-backup-' + time + '.db';
 
-  console.log('backing up to:' + filename);
+  console.log('Backing up to:' + filename);
 
   //if (!fs.existsSync(file)) {
     childProcess.exec('cp dbfile.db ' + filename, function(err) {
-      console.log('err:' + err);
+      if (err) {
+        console.log('Error backing up:' + err);
+      }
     });
   //}
 };
 
 
-app.set('port', process.env.PORT || 8888);
+app.set('port', process.env.PORT || settings.port);
 
 backup();
 
 setInterval(backup, 24 * 60 * 60 * 1000);
 
 function launchChrome() {
-  console.log('launching chrome...');
-  var exists = fs.existsSync('/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome');
-
-  if (exists) {
-    childProcess.exec('/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --kiosk --incognito http://localhost:8888/', function(err) {
-      console.log('err:' + err);
-    });
-  } else {
-    var exists = fs.existsSync('/Applications/Internet/Google\ Chrome.app/Contents/MacOS/Google\ Chrome');
-
-    if (exists) {
-      childProcess.exec('/Applications/Internet/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome --kiosk --incognito http://localhost:8888/', function(err) {
-        console.log('err:' + err);
-      });
-    } else {
-      console.log('cant find google chrome.');
+  for (var i = 0; i < settings.chromePaths.length; i++) {
+    var path = settings.chromePaths[i];
+    console.log('Attempting to launch chrome from ' + path);
+    if (fs.existsSync(path)) {
+      childProcess.exec(['"' + path + '"', settings.chromeFlags, 'http://localhost:' + settings.port].join(' '), 
+        function(err) {
+          if (err) {
+            console.log('Error launching chrome: ' + err);
+          }
+        });
+      return;
     }
   }
+
+  console.log('Can\'t find Chrome, update the settings.js file and add its path.');
 }
 
 function killChrome() {
