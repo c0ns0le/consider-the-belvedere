@@ -8,6 +8,7 @@ module.exports = {
   backupDir: '~/documents/',
   port: '8888',
   autoSuggest: {
-    maxWords: 20,
+    maxWords: 35,
+    minWords: 25
   }
 };

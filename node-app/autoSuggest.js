@@ -3,8 +3,15 @@ var settings = require('./settings');
 
 
 function buildSeq(db, firstWord, callback) {
+  var minLength = settings.autoSuggest.minWords || 30;
   var maxLength = settings.autoSuggest.maxWords || 50;
+  
+  if (minLength > maxLength) {
+    minLength = maxLength;
+  }
 
+  maxLength = Math.floor(Math.random() * (maxLength - minLength)) + minLength;
+  
   var lastWord = firstWord;
 
   var seq = [firstWord];
@@ -21,8 +28,6 @@ function buildSeq(db, firstWord, callback) {
         callback(null, seq);
         return;
       }
-
-      console.log('next word: ' + word);
 
       seq.push(word);
       lastWord = word;
@@ -83,7 +88,43 @@ function nextWord(db, firstWord, callback) {
 }
 
 function storeText(db, text, opt_cb) {
-  var allWords = _.map(text.split(/\W+/), function(word) {
+  // Split into sentences.
+  var allSentences = text.split(/[.?!;]+/);
+
+  if (allSentences.length == 0) {
+    if (opt_cb) {
+      opt_cb();
+    }
+
+    return;
+  }
+
+  cb = opt_cb || function(){};
+
+  var index = -1;
+
+  var nextSentence = function() {
+    if (++index >= allSentences.length) {
+      cb();
+      return;
+    }
+
+    storeSentence(db, allSentences[index], function(err) {
+      if (err) {
+        cb(err);
+        return;
+      }
+
+      nextSentence();
+    });
+  };
+
+  nextSentence();
+}
+
+
+function storeSentence(db, text, opt_cb) {
+  var allWords = _.map(text.split(/[^\w']+/), function(word) {
     if (word.length > 255) {
       word = word.substr(0, 255);
     }
@@ -96,6 +137,14 @@ function storeText(db, text, opt_cb) {
 
   var stmt;
   var index = -1;
+
+  if (allWords.length == 0) {
+    if (opt_cb) {
+      opt_cb();
+    }
+
+    return;
+  }
 
   var complete = function(err) {
     if (stmt) {
@@ -147,11 +196,6 @@ function suggest(db, word, callback) {
         return;
       }
 
-      for (var key in row) {
-        console.log(key);
-      }
-      console.log('got row ' + row.first_word);
-
       if (!(row.first_word in dict)) {
         dict[row.first_word] = row.count;
       } else {
@@ -183,12 +227,24 @@ function suggest(db, word, callback) {
     });
 }
 
-function initDB(db) {
-  db.run('CREATE TABLE IF NOT EXISTS words (first_word VARCHAR(255), second_word VARCHAR(255), count int, UNIQUE(first_word, second_word) ON CONFLICT REPLACE)');
+function initDB(db, callback) {
+  db.run('CREATE TABLE IF NOT EXISTS words (first_word VARCHAR(255), second_word VARCHAR(255), count int, UNIQUE(first_word, second_word) ON CONFLICT REPLACE)', callback);
+}
+
+function isEmpty(db, callback) {
+  db.get('SELECT count(*) FROM words', function(err, row) {
+    if (err) {
+      callback(err);
+      return;
+    }
+
+    callback(null, row['count(*)'] <= 0);
+  });
 }
 
 module.exports = {
   storeText: storeText,
   suggest: suggest,
-  initDB: initDB
+  initDB: initDB,
+  isEmpty: isEmpty
 };

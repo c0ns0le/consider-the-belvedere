@@ -14,7 +14,7 @@ var settings = require('./settings');
 
 var fs = require("fs");
 var file = "dbfile.db";
-var exists = fs.existsSync(file);
+//var exists = fs.existsSync(file);
 var db = new sqlite3.Database(file);
 
 
@@ -109,10 +109,64 @@ app.use(function(req, res, next) {
 // Setup database on first run.
 db.serialize(function() {
   db.run('CREATE TABLE IF NOT EXISTS posts (id unique, user_column int, ts VARCHAR(255), header VARCHAR(255), body VARCHAR(2047))');
-  autoSuggest.initDB(db);
+  autoSuggest.initDB(db,
+    function(err) {
+      if (err) {
+        console.log('Error initing auto suggest db ' + err);
+        return;
+      }
+
+      autoSuggest.isEmpty(db,
+        function(err, empty) {
+          if (err) {
+            console.log('Error checking autosuggest empty.');
+            return;
+          }
+
+          if (empty) {
+            learnFromDB(db);
+          }
+      });
+    });
 });
 
+function learnFromDB(db) {
+  var count = 0;
+  var texts = [];
+  var index = -1;
 
+  var learnNext = function() {
+    if (++index >= texts.length) {
+      return;
+    }
+
+    console.log('Learning ' + ((index / (texts.length - 1)) * 100) + '%');
+    autoSuggest.storeText(db, texts[index], function(err) {
+      if (err) {
+        console.log('Error learning ' + err);
+        return;
+      }
+
+      learnNext();
+    });
+  };
+  db.each('SELECT header, body FROM posts',
+    function(err, row) {
+      if (err) {
+        console.log('Error with row ' + err);
+        return;
+      }
+      texts.push(row.header + ' ' + row.body);
+    },
+    function(err, ctx) {
+      if (err) {
+        console.log('Error getting posts ' + err);
+        return;
+      }
+
+      learnNext();
+    });
+};
  
 function backup() {
 

@@ -81,8 +81,13 @@ body {
     left: 0;
     top: 0;
     width: 120%;
-    border: 1px solid red;
+    font-size: 0.8em;
+    line-height: 1em;
+    padding: 20px;
+    text-align: center;
+    background: rgba(255,255,255,0.2);
     color: #ffffff;
+    border-radius: 80px;
 }
 
 .column {

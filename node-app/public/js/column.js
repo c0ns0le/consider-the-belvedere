@@ -220,7 +220,7 @@ Column.prototype.autoSuggest = function() {
         blurb += this.post.body;
     }
 
-    var allWords = blurb.split(/\W+/);
+    var allWords = blurb.split(/[^\w']+/);
     var lastWord = '';
 
     // Pop off any garbage
