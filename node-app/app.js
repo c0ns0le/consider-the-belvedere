@@ -5,17 +5,21 @@ var sys = require('sys')
 var childProcess = require('child_process');
 
 var app = express();
+var request = require('request');
 var sqlite3 = require('sqlite3').verbose();
 var _ = require('lodash');
 
 var autoSuggest = require('./autoSuggest');
 var settings = require('./settings');
 
+var util = require('util');
+
 
 var fs = require("fs");
-var file = "dbfile.db";
+var dbFileName = "dbfile.db";
+var dbBackupFileName = "dbfile.db.tmp";
 //var exists = fs.existsSync(file);
-var db = new sqlite3.Database(file);
+var db = new sqlite3.Database(dbFileName);
 
 
 
@@ -92,6 +96,33 @@ app.get('/suggest/:word',
       });
   });
 
+app.get('/update-db',
+  function(req, res) {
+    var file = fs.createWriteStream(dbBackupFileName);
+
+    file.on('finish', function() {
+      file.close(function() {
+        var stat = fs.statSync(dbBackupFileName);
+        console.log('Got file ' + util.inspect(stat, false, null));
+        db.close();
+        fs.renameSync(dbBackupFileName, dbFileName)
+        db = new sqlite3.Database(dbFileName);
+        res.send('Updated db');
+      });
+    });
+
+    request.get(settings.remoteDB).pipe(file);
+
+    /*
+      response.pipe(file);
+      
+    }).on('error', function(err) {
+      fs.unlink(file);
+      res.send('Failed to update: ' + err.message);
+    });
+    */
+  });
+
 
 
 
@@ -129,6 +160,8 @@ db.serialize(function() {
       });
     });
 });
+
+
 
 function learnFromDB(db) {
   var count = 0;

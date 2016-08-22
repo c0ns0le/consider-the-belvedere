@@ -71,3 +71,8 @@ if [ $LINUX == true ]; then
   echo 'LINUX TRUE'
 fi
 
+
+cd node-app
+npm install
+cd ..
+

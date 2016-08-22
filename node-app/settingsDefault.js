@@ -10,5 +10,6 @@ module.exports = {
   autoSuggest: {
     maxWords: 35,
     minWords: 25
-  }
+  },
+  remoteDB: 'https://drive.google.com/uc?export=download&id=0BwzIpvfIbVWOZlRxb3hrbWJyX0U'
 };
