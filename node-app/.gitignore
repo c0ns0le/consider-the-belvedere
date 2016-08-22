@@ -1,3 +1,4 @@
 *.db
+db-backups/*.db
 node_modules
 settings.js
