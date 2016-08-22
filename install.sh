@@ -43,7 +43,6 @@ rsync -u -p node-app/settingsDefault.js node-app/settings.js
 if [ $MAC == true ]; then
 
 echo 'Installing startup script...'
-
 echo 'Exiting because I don wanna install now, remove this later'
 exit
 

@@ -5,7 +5,7 @@ module.exports = {
     '/Applications/Internet/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
   ],
   chromeFlags: '--kiosk --incognito',
-  backupDir: '~/documents/',
+  backupDir: '../db-backups/',
   port: '8888',
   autoSuggest: {
     maxWords: 35,
