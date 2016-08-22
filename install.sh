@@ -37,6 +37,8 @@ EOM
 
 chmod 755 $STARTUP
 
+mkdir -p 'db-backups'
+
 echo 'Copying settings file for local customization...'
 rsync -u -p node-app/settingsDefault.js node-app/settings.js
 

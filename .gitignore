@@ -1,4 +1,5 @@
 .DS_Store
 *.db
+db-backups
 startup.sh
 philly-dreams.csv
