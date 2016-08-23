@@ -98,33 +98,28 @@ app.get('/suggest/:word',
 
 app.get('/update-db',
   function(req, res) {
-    var file = fs.createWriteStream(dbBackupFileName);
-
-    file.on('finish', function() {
-      file.close(function() {
-        var stat = fs.statSync(dbBackupFileName);
-        console.log('Got file ' + util.inspect(stat, false, null));
-        db.close();
-        fs.renameSync(dbBackupFileName, dbFileName)
-        db = new sqlite3.Database(dbFileName);
-        res.send('Updated db');
-      });
+    updateDB(function(err) {
+      res.send('Updated db.');
     });
-
-    request.get(settings.remoteDB).pipe(file);
-
-    /*
-      response.pipe(file);
-      
-    }).on('error', function(err) {
-      fs.unlink(file);
-      res.send('Failed to update: ' + err.message);
-    });
-    */
   });
 
 
+function updateDB(cb) {
+  var file = fs.createWriteStream(dbBackupFileName);
 
+  file.on('finish', function() {
+    file.close(function() {
+      var stat = fs.statSync(dbBackupFileName);
+      console.log('Got file ' + util.inspect(stat, false, null));
+      db.close();
+      fs.renameSync(dbBackupFileName, dbFileName)
+      db = new sqlite3.Database(dbFileName);
+      cb(null);
+    });
+  });
+
+  request.get(settings.remoteDB).pipe(file);
+}
 
 // Load the index page + js
 app.use(express.static(path.join(__dirname, 'public')));
@@ -140,6 +135,7 @@ app.use(function(req, res, next) {
 // Setup database on first run.
 db.serialize(function() {
   db.run('CREATE TABLE IF NOT EXISTS posts (id unique, user_column int, ts VARCHAR(255), header VARCHAR(255), body VARCHAR(2047))');
+
   autoSuggest.initDB(db,
     function(err) {
       if (err) {
