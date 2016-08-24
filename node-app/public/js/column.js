@@ -92,6 +92,8 @@ Column.prototype.startPost = function() {
 
 Column.prototype.showCta = function() {
     if (!this.ctaVisible) {
+        this.dreamEl.remove();
+
         var self = this;
         var ctaPos = 0;
         this.getCurrentPostView().container[0].style.display = 'none';
@@ -190,8 +192,18 @@ Column.prototype.testPassword = function(charCode) {
 };
 
 Column.prototype.displayAutoSuggest = function(text) {
+    // Hide any previous post views
+    this.dreamEl.remove();
+    this.dreamEl.css({opacity: 0, filter: 'blur(5px)'});
+
+    this.getCurrentPostView().container.append(this.dreamEl);
+
     this.dreamEl.text(text);
-    this.dreamEl.show();
+
+    var self = this;
+    setTimeout(function() {
+        self.dreamEl.css({opacity: 1, filter: 'blur(0px)'});
+    }, 100);
 }
 
 Column.prototype.autoSuggest = function() {
@@ -205,7 +217,6 @@ Column.prototype.autoSuggest = function() {
         this.autoSuggestTimeout = setTimeout(function() {
             self.autoSuggest();
         }, 2500);
-        console.log('Waiting...');
         return;
     }
 

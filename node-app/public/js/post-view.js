@@ -110,7 +110,8 @@ PostView.prototype.updateDate = function(time) {
      + ', ' + date.getFullYear();
      //+ ' ' + time
     this.date.text(this.dateText);
-}
+};
+
 
 /**
  * Updates the postview with the model data.
