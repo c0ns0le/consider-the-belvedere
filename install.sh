@@ -27,6 +27,8 @@ esac
 
 STARTUP=$(pwd)/startup.sh
 APP=$(pwd)/node-app
+AUTOSTART=$HOME/.config/autostart/NightTimes.desktop
+
 
 cat <<EOM >startup.sh
 #!/bin/sh
@@ -44,10 +46,13 @@ rsync -u -p node-app/settingsDefault.js node-app/settings.js
 
 if [ $MAC == true ]; then
 
-echo 'Installing startup script...'
-echo 'Exiting because I don wanna install now, remove this later'
-exit
-
+read -p "Install autostart script? (y/n)" -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+  echo "Skipping autostart script. You can run using ./startup.sh"
+else
+echo "Installing autostart script..."
 cat <<EOM >~/Library/LaunchAgents/considerthebelvedere.plist
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -67,12 +72,41 @@ cat <<EOM >~/Library/LaunchAgents/considerthebelvedere.plist
 EOM
 fi
 
-if [ $LINUX == true ]; then
-  echo 'LINUX TRUE'
 fi
 
 
+if [ $LINUX == true ]; then
+
+read -p "Install autostart script? (y/n)" -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+  echo "Skipping autostart script. You can run using ./startup.sh"
+else
+echo "Installing autostart script..."
+
+mkdir -p "$(dirname "$AUTOSTART")"
+
+cat <<EOM >$AUTOSTART
+#!/usr/bin/env xdg-open 
+[Desktop Entry] 
+Version=1.0 
+Name=Night Times startup 
+Comment=Remember the Belvedere 
+Exec=$STARTUP
+Type=Application 
+Categories=Startup 
+EOM
+chmod 755 $AUTOSTART
+fi
+
+
+
+fi
+
+echo "Installing node dependencies..."
 cd node-app
 npm install
 cd ..
+echo "Ready!"
 

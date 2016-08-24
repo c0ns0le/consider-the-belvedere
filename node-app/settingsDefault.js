@@ -2,7 +2,8 @@
 module.exports = {
   chromePaths: [
     '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome',
-    '/Applications/Internet/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
+    '/Applications/Internet/Google\ Chrome.app/Contents/MacOS/Google\ Chrome',
+    '/usr/bin/google-chrome'
   ],
   chromeFlags: '--kiosk --incognito',
   backupDir: '../db-backups/',
