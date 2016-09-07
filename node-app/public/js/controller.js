@@ -28,7 +28,12 @@ var Controller = function(numCols, addrStart) {
         $(document).bind('keydown', function(evt) { self.keyDown(evt); });
         $(document).bind('keyup', function(evt) { self.keyUp(evt); });
         $(document).bind('keypress', function(evt) { self.keyPress(evt); });
-    });      
+    });     
+
+    setTimeout(function() {
+        console.log('Attempting to hide cursor...');
+        $('body').css({cursor: 'none'});
+    }, 10000); 
 };
 
 Controller.prototype.loadDreams = function() {
@@ -65,6 +70,7 @@ Controller.prototype.keyDown = function(evt) {
     //console.log('kcd:'  +keyCode);
     if (keyCode >= 112 && keyCode < 112 + this.columns.length) {
         this.startAddr(keyCode - 112);
+        evt.preventDefault();
     } else if (keyCode == 8 || keyCode == 127) { // Delete
         if (this.currentAddr > -1) {
             this.columns[this.currentAddr].keyBack();
@@ -86,6 +92,7 @@ Controller.prototype.keyUp = function(evt) {
 
     if (keyCode >= 112 && keyCode < 112 + this.columns.length) {
         this.endAddr(keyCode - 112);
+        evt.preventDefault();
     }
 
     //evt.preventDefault();
@@ -100,6 +107,7 @@ Controller.prototype.keyPress = function(evt) {
     var self = this;
     if (this.currentAddr > -1) {
         this.columns[this.currentAddr].keyPress(evt.charCode);
+        evt.preventDefault();
     }
 
     //evt.preventDefault();

@@ -82,6 +82,10 @@ var Column = function(id, persister, delegate) {
     });
 };
 
+Column.MIN_AUTOSUGGEST_INTERVAL_MS = 15000;
+Column.AUTOSUGGEST_TIMEOUT_MS = 2500;
+Column.MIN_AUTOSUGGEST_WORDS = 4;
+
 Column.prototype.startPost = function() {
     // Create an empty post to type into
     this.isHeader = true;
@@ -192,18 +196,20 @@ Column.prototype.testPassword = function(charCode) {
 };
 
 Column.prototype.displayAutoSuggest = function(text) {
+    // Fade it in only if its not in the dom already.
+    var shouldFadeIn = true;//this.dreamEl.parent().length == 0;
     // Hide any previous post views
-    this.dreamEl.remove();
-    this.dreamEl.css({opacity: 0, filter: 'blur(5px)'});
-
-    this.getCurrentPostView().container.append(this.dreamEl);
+    if (shouldFadeIn) {
+        this.dreamEl.remove();
+        this.dreamEl.css({opacity: 0, filter: 'blur(5px)'});
+        this.getCurrentPostView().container.append(this.dreamEl);
+        var self = this;
+        setTimeout(function() {
+            self.dreamEl.css({opacity: 1, filter: 'blur(0px)'});
+        }, 100);
+    }
 
     this.dreamEl.text(text);
-
-    var self = this;
-    setTimeout(function() {
-        self.dreamEl.css({opacity: 1, filter: 'blur(0px)'});
-    }, 100);
 }
 
 Column.prototype.autoSuggest = function() {
@@ -212,11 +218,11 @@ Column.prototype.autoSuggest = function() {
     // If we received a suggestion response, don't request another one for 
     // 5 seconds. Also don't do requests faster than 2.5 seconds apart.
     var t = new Date().getTime();
-    if (t - this.lastSuccessfulAutoSuggestTimeMS < 5000 || t - this.lastAutoSuggestTimeMS < 2500) {
+    if (t - this.lastSuccessfulAutoSuggestTimeMS < Column.MIN_AUTOSUGGEST_INTERVAL_MS || t - this.lastAutoSuggestTimeMS < Column.AUTOSUGGEST_TIMEOUT_MS) {
         clearTimeout(this.autoSuggestTimeout);
         this.autoSuggestTimeout = setTimeout(function() {
             self.autoSuggest();
-        }, 2500);
+        }, Column.AUTOSUGGEST_TIMEOUT_MS);
         return;
     }
 
@@ -242,7 +248,7 @@ Column.prototype.autoSuggest = function() {
         }
     }
 
-    if (lastWord.length < 2 || lastWord == this.lastAutoSuggest) {
+    if (lastWord.length < Column.MIN_AUTOSUGGEST_WORDS || lastWord == this.lastAutoSuggest) {
         return;
     }
 
